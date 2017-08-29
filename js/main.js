@@ -1,11 +1,14 @@
-window.onload = function(){
+function btnPress () {
+  document.getElementById('loading-img').style = 'display:none'
 
-    setTimeout(() => {
-        document.getElementById('loading-img').style = "display:none"
-        document.getElementById('season-table').className = ""
-        console.log('boh ya')
-    },3000)
+  loadSeason().then((result) => {
+    var Season = JSON.parse(result)
 
-    //Juntar isso com o codigo de fetch da API 
-    
+    console.log(Season)
+    // console.log(Season)
+  }, (err) => {
+    console.log(err)
+  })
+
+  console.log('boh ya')
 }
