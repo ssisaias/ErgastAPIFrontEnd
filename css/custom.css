@@ -1,0 +1,10 @@
+.center {
+    position: absolute;
+    left: 50%;
+    margin-left: -100px;
+}
+
+.main {
+    padding: 2em;
+    color: black;
+}
