@@ -29,4 +29,8 @@
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
   }
-  
+
+#schedules > tr:hover{
+  cursor: pointer;
+  background-color: gray;
+}
