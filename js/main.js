@@ -67,7 +67,7 @@ function fetchSchedule (url, httpVerb) {
       document.getElementById('schedule-table').className = 'visible'
       var races = response['MRData']['RaceTable']['Races']
       races.forEach(function (element) {
-        document.getElementById('schedules').insertAdjacentHTML('beforeend', `<tr>
+        document.getElementById('schedules').insertAdjacentHTML('beforeend', `<tr title="Mostrar vencedores">
         <td>${element.round}</td>
         <td>${element.date}</td>
         <td>${element.time}</td>
