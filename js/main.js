@@ -1,6 +1,27 @@
+var seasonOffset = 0
+
 window.onload = () => {
-  fetchSeason('http://ergast.com/api/f1/seasons.json?limit=68', 'GET')
+  fetchSeason('http://ergast.com/api/f1/seasons.json?limit=10', 'GET')
   // fetchSchedule('http://ergast.com/api/f1/2012.json', 'GET')
+  // document.getElementById('nav-previous-season').setAttribute('onclick', `#`)
+  // document.getElementById('nav-next-season').setAttribute('onclick', `fetchSeason('http://ergast.com/api/f1/seasons.json?limit=10&offset=${seasonOffset}','GET')`)
+}
+
+function navNextSeason () {
+  seasonOffset += 10
+  document.getElementById('season-loading').className = 'loader visible'
+  document.getElementById('season-table').className = 'hidden'
+  document.getElementById('seasons').innerHTML = ''
+  fetchSeason(`http://ergast.com/api/f1/seasons.json?limit=10&offset=${seasonOffset}`, 'GET')
+}
+
+function navPrevSeason () {
+  seasonOffset -= 10
+  if (seasonOffset < 0) seasonOffset = 0
+  document.getElementById('season-loading').className = 'loader visible'
+  document.getElementById('season-table').className = 'hidden'
+  document.getElementById('seasons').innerHTML = ''
+  fetchSeason(`http://ergast.com/api/f1/seasons.json?limit=10&offset=${seasonOffset}`, 'GET')
 }
 
 function fetchSeason (url, httpVerb) {
@@ -15,7 +36,6 @@ function fetchSeason (url, httpVerb) {
       document.getElementById('season-loading').className = 'hidden'
       document.getElementById('season-table').className = 'visible'
       var seasons = response['MRData']['SeasonTable']['Seasons']
-      seasons.reverse()
       seasons.forEach(function (element) {
         document.getElementById('seasons').insertAdjacentHTML('beforeend', `<tr>
         <td><a onclick="javascript:fetchSchedule('http://ergast.com/api/f1/'+${element.season}+'.json','GET')" class="pure-button" >${element.season}</a></td>
@@ -39,7 +59,6 @@ function fetchSchedule (url, httpVerb) {
     method: httpVerb
   }).then((response) => {
     if (response.ok) {
-      console.log(response)
       return response.json()
     }
   })
@@ -58,15 +77,21 @@ function fetchSchedule (url, httpVerb) {
         <td><a href="${element.url}" target="_blank"><i class="fa fa-external-link" aria-hidden="true"></i></a></td>
         </tr>`)
       }, this)
-      document.getElementById('current-season').innerHTML = `Temporada ${response['MRData']['RaceTable']['season']}`
-      document.getElementById('current-season-winner').innerHTML = `Campeão da temporada: ${response['MRData']['RaceTable']['season']}`
+      var temporada = response['MRData']['RaceTable']['season']
+      document.getElementById('current-season').innerHTML = `${(temporada == new Date().getFullYear()) ? 'Temporada (Atual)' : 'Temporada'}: ${temporada}`
+      document.getElementById('current-season-winner').innerHTML = 'Campeão da temporada:  - - - '
       console.log(`http://ergast.com/api/f1/${response['MRData']['RaceTable']['season']}/driverStandings/1.json`)
       // Erro aqui!
-      fetch(`http://ergast.com/api/f1/${response['MRData']['RaceTable']['season']}/driverStandings/1.json`).then((response)=>{
-        var json = response.json()
-        var champs = json['MRData']['StandingsTable']['StandingsLists']['DriverStandings']['Driver']
+      fetch(`http://ergast.com/api/f1/${response['MRData']['RaceTable']['season']}/driverStandings/1.json`).then((response) => {
+        if (response.ok) {
+          return response.json()
+        }
+      })
+      .then((json) => {
+        console.log(json)
+        var champs = json['MRData']['StandingsTable']['StandingsLists'][0]['DriverStandings'][0]['Driver']
         var name = champs.givenName + ' ' + champs.familyName
-        document.getElementById('current-season-winner').innerHTML = `Campeão da temporada: ${name}`
+        document.getElementById('current-season-winner').innerHTML = (temporada == new Date().getFullYear()) ? `Campeão até o momento: ${name}` : `Campeão da temporada: ${name}`
       })
       // console.log(seasons)
     })
